@@ -322,21 +322,21 @@ int main() {
     
     // Populate PAN list
     panList = insertPAN(panList, aadharList, "Aditi", "123 Main St", "P123", "A123");
-    panList = insertPAN(panList, aadharList, "Aditi", "123 Main St", "P124", "A123"); // Multiple PAN for John Doe
+    panList = insertPAN(panList, aadharList, "Aditi", "123 Main St", "P124", "A123");
     panList = insertPAN(panList, aadharList, "Sarthak", "789 Oak St", "P789", "A789");
     panList = insertPAN(panList, aadharList, "Aleena", "101 Pine St", "P101", "A101");
     panList = insertPAN(panList, aadharList, "Mayank", "202 Maple St", "P202", "A202");
     panList = insertPAN(panList, aadharList, "Abhinav", "303 Cedar St", "P303", "A303");
-    panList = insertPAN(panList, aadharList, "Abhinav", "303 Cedar St", "P304", "A303"); // Multiple PAN for David Wilson
+    panList = insertPAN(panList, aadharList, "Abhinav", "303 Cedar St", "P304", "A303"); 
     
     // Populate Bank Account list
     bankAccountList = insertBankAccount(bankAccountList, panList, "Aditi", "P123", "Bank1", "B123", 5000);
-    bankAccountList = insertBankAccount(bankAccountList, panList, "Aditi", "P124", "Bank2", "B124", 7000); // Multiple bank accounts for John Doe
+    bankAccountList = insertBankAccount(bankAccountList, panList, "Aditi", "P124", "Bank2", "B124", 7000);
     bankAccountList = insertBankAccount(bankAccountList, panList, "Sarthak", "P789", "Bank1", "B789", 12000);
     bankAccountList = insertBankAccount(bankAccountList, panList, "Aleena", "P101", "Bank2", "B101", 8000);
     bankAccountList = insertBankAccount(bankAccountList, panList, "Mayank", "P202", "Bank3", "B202", 15000);
     bankAccountList = insertBankAccount(bankAccountList, panList, "Abhinav", "P303", "Bank4", "B303", 6000);
-    bankAccountList = insertBankAccount(bankAccountList, panList, "Abhinav", "P304", "Bank5", "B304", 9000); // Multiple bank accounts for David Wilson
+    bankAccountList = insertBankAccount(bankAccountList, panList, "Abhinav", "P304", "Bank5", "B304", 9000); 
     
     // Populate LPG list
     lpgList = insertLPG(lpgList, bankAccountList, "Aditi", "B123", "YES");
@@ -344,7 +344,7 @@ int main() {
     lpgList = insertLPG(lpgList, bankAccountList, "Aleena", "B101", "NO");
     lpgList = insertLPG(lpgList, bankAccountList, "Mayank", "B202", "YES");
     lpgList = insertLPG(lpgList, bankAccountList, "Abhinav", "B303", "YES");
-    lpgList = insertLPG(lpgList, bankAccountList, "Abhinav", "B304", "NO"); // Multiple accounts, some with subsidy, some without
+    lpgList = insertLPG(lpgList, bankAccountList, "Abhinav", "B304", "NO"); 
     
     // Example function calls to demonstrate functionality
     printf("Aadhar numbers without PAN numbers:\n");
