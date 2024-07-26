@@ -42,28 +42,28 @@ typedef struct LPG {
     BankAccount* linkedBankAccount;
 } LPG;
 
-
-
-
-
-
-
-
-
-//*****************************create nodes**********************************
-
-// Function to create a new Aadhar node
-Aadhar* createAadhar(char* name, char* address, char* aadharNumber) {
+// Function to create and insert a new Aadhar node at the end of the list
+Aadhar* insertAadhar(Aadhar* head, char* name, char* address, char* aadharNumber) {
     Aadhar* newAadhar = (Aadhar*)malloc(sizeof(Aadhar));
     strcpy(newAadhar->name, name);
     strcpy(newAadhar->address, address);
     strcpy(newAadhar->aadharNumber, aadharNumber);
     newAadhar->next = NULL;
-    return newAadhar;
+    
+    if (head == NULL) {
+        return newAadhar;
+    }
+    
+    Aadhar* temp = head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newAadhar;
+    return head;
 }
 
-// Function to create a new PAN node
-PAN* createPAN(char* name, char* address, char* panNumber, char* aadharNumber) {
+// Function to create and insert a new PAN node at the end of the list and link to Aadhar
+PAN* insertPAN(PAN* head, Aadhar* aadharList, char* name, char* address, char* panNumber, char* aadharNumber) {
     PAN* newPAN = (PAN*)malloc(sizeof(PAN));
     strcpy(newPAN->name, name);
     strcpy(newPAN->address, address);
@@ -71,11 +71,30 @@ PAN* createPAN(char* name, char* address, char* panNumber, char* aadharNumber) {
     strcpy(newPAN->aadharNumber, aadharNumber);
     newPAN->next = NULL;
     newPAN->linkedAadhar = NULL;
-    return newPAN;
+    
+    Aadhar* tempAadhar = aadharList;
+    while (tempAadhar != NULL) {
+        if (strcmp(tempAadhar->aadharNumber, aadharNumber) == 0) {
+            newPAN->linkedAadhar = tempAadhar;
+            break;
+        }
+        tempAadhar = tempAadhar->next;
+    }
+    
+    if (head == NULL) {
+        return newPAN;
+    }
+    
+    PAN* temp = head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newPAN;
+    return head;
 }
 
-// Function to create a new Bank Account node
-BankAccount* createBankAccount(char* name, char* panNumber, char* bank, char* accountNumber, double depositedAmount) {
+// Function to create and insert a new Bank Account node at the end of the list and link to PAN
+BankAccount* insertBankAccount(BankAccount* head, PAN* panList, char* name, char* panNumber, char* bank, char* accountNumber, double depositedAmount) {
     BankAccount* newAccount = (BankAccount*)malloc(sizeof(BankAccount));
     strcpy(newAccount->name, name);
     strcpy(newAccount->panNumber, panNumber);
@@ -84,471 +103,267 @@ BankAccount* createBankAccount(char* name, char* panNumber, char* bank, char* ac
     newAccount->depositedAmount = depositedAmount;
     newAccount->next = NULL;
     newAccount->linkedPAN = NULL;
-    return newAccount;
+    
+    PAN* tempPAN = panList;
+    while (tempPAN != NULL) {
+        if (strcmp(tempPAN->panNumber, panNumber) == 0) {
+            newAccount->linkedPAN = tempPAN;
+            break;
+        }
+        tempPAN = tempPAN->next;
+    }
+    
+    if (head == NULL) {
+        return newAccount;
+    }
+    
+    BankAccount* temp = head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newAccount;
+    return head;
 }
 
-// Function to create a new LPG node
-LPG* createLPG(char* name, char* accountNumber, char* subsidyStatus) {
+// Function to create and insert a new LPG node at the end of the list and link to Bank Account
+LPG* insertLPG(LPG* head, BankAccount* bankList, char* name, char* accountNumber, char* subsidyStatus) {
     LPG* newLPG = (LPG*)malloc(sizeof(LPG));
     strcpy(newLPG->name, name);
     strcpy(newLPG->accountNumber, accountNumber);
     strcpy(newLPG->subsidyStatus, subsidyStatus);
     newLPG->next = NULL;
     newLPG->linkedBankAccount = NULL;
-    return newLPG;
-}
-
-
-//*************************linking of lists**************************************
-
-// Function to link PAN node to Aadhar node
-void linkPANToAadhar(PAN* panNode, Aadhar* aadharList) {
-    while (aadharList != NULL) {
-        if (strcmp(panNode->aadharNumber, aadharList->aadharNumber) == 0) {
-            panNode->linkedAadhar = aadharList;
-            return;
+    
+    BankAccount* tempBank = bankList;
+    while (tempBank != NULL) {
+        if (strcmp(tempBank->accountNumber, accountNumber) == 0) {
+            newLPG->linkedBankAccount = tempBank;
+            break;
         }
-        aadharList = aadharList->next;
+        tempBank = tempBank->next;
     }
+    
+    if (head == NULL) {
+        return newLPG;
+    }
+    
+    LPG* temp = head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newLPG;
+    return head;
 }
 
-// Function to link Bank Account node to PAN node
-void linkBankAccountToPAN(BankAccount* bankAccountNode, PAN* panList) {
-    while (panList != NULL) {
-        if (strcmp(bankAccountNode->panNumber, panList->panNumber) == 0) {
-            bankAccountNode->linkedPAN = panList;
-            return;
-        }
-        panList = panList->next;
-    }
-}
-
-// Function to link LPG node to Bank Account node
-void linkLPGToBankAccount(LPG* lpgNode, BankAccount* bankList) {
-    while (bankList != NULL) {
-        if (strcmp(lpgNode->accountNumber, bankList->accountNumber) == 0) {
-            lpgNode->linkedBankAccount = bankList;
-            return;
-        }
-        bankList = bankList->next;
-    }
-}
-
-
-
-
-//********************print functions**************************
-
-void printAadharList(Aadhar* aadharList) {
-    while (aadharList != NULL) {
-        printf("Name: %s\n", aadharList->name);
-        printf("Address: %s\n", aadharList->address);
-        printf("Aadhar Number: %s\n", aadharList->aadharNumber);
-        printf("\n");
-        aadharList = aadharList->next;
-    }
-}
-
-void printPANList(PAN* panList) {
-    while (panList != NULL) {
-        printf("Name: %s\n", panList->name);
-        printf("Address: %s\n", panList->address);
-        printf("PAN Number: %s\n", panList->panNumber);
-        printf("Aadhar Number: %s\n", panList->aadharNumber);
-        if (panList->linkedAadhar != NULL) {
-            printf("Linked Aadhar: %s\n", panList->linkedAadhar->aadharNumber);
-        } else {
-            printf("Linked Aadhar: None\n");
-        }
-        printf("\n");
-        panList = panList->next;
-    }
-}
-
-// Function to print the details of Bank Account nodes
-void printBankAccountList(BankAccount* bankList) {
-    while (bankList != NULL) {
-        printf("Name: %s\n", bankList->name);
-        printf("PAN Number: %s\n", bankList->panNumber);
-        printf("Bank: %s\n", bankList->bank);
-        printf("Account Number: %s\n", bankList->accountNumber);
-        printf("Deposited Amount: %.2f\n", bankList->depositedAmount);
-        if (bankList->linkedPAN != NULL) {
-            printf("Linked PAN: %s\n", bankList->linkedPAN->panNumber);
-        } else {
-            printf("Linked PAN: None\n");
-        }
-        printf("\n");
-        bankList = bankList->next;
-    }
-}
-
-// Function to print the details of LPG nodes
-void printLPGList(LPG* lpgList) {
-    while (lpgList != NULL) {
-        printf("Name: %s\n", lpgList->name);
-        printf("Account Number: %s\n", lpgList->accountNumber);
-        printf("Subsidy Status: %s\n", lpgList->subsidyStatus);
-        if (lpgList->linkedBankAccount != NULL) {
-            printf("Linked Bank Account: %s\n", lpgList->linkedBankAccount->accountNumber);
-        } else {
-            printf("Linked Bank Account: None\n");
-        }
-        printf("\n");
-        lpgList = lpgList->next;
-    }
-}
-
-//***********************************QUESTIONS*************************************
-
-// Function to print names, addresses, and Aadhar numbers of people with Aadhar but no PAN
+// Function to print Aadhar numbers without PAN numbers
 void printAadharWithoutPAN(Aadhar* aadharList, PAN* panList) {
-    while (aadharList != NULL) {
-        PAN* temp = panList;
-        int found = 0;
-        while (temp != NULL) {
-            if (strcmp(aadharList->aadharNumber, temp->aadharNumber) == 0) {
+    Aadhar* aadharTemp = aadharList;
+    int found;
+    while (aadharTemp != NULL) {
+        found = 0;
+        PAN* panTemp = panList;
+        while (panTemp != NULL) {
+            if (strcmp(aadharTemp->aadharNumber, panTemp->aadharNumber) == 0) {
                 found = 1;
                 break;
             }
-            temp = temp->next;
+            panTemp = panTemp->next;
         }
         if (!found) {
-            printf("Name: %s\n", aadharList->name);
-            printf("Address: %s\n", aadharList->address);
-            printf("Aadhar Number: %s\n", aadharList->aadharNumber);
-            printf("\n");
+            printf("%s\n", aadharTemp->aadharNumber);
         }
-        aadharList = aadharList->next;
+        aadharTemp = aadharTemp->next;
     }
 }
 
+// Function to print people with multiple PAN numbers
 void printPeopleWithMultiplePANs(PAN* panList) {
-    PAN* current = panList;
-    while (current != NULL) {
+    PAN* panTemp1 = panList;
+    while (panTemp1 != NULL) {
+        PAN* panTemp2 = panTemp1->next;
         int count = 0;
-        PAN* temp = panList;
-        while (temp != NULL) {
-            if (strcmp(current->aadharNumber, temp->aadharNumber) == 0) {
+        while (panTemp2 != NULL) {
+            if (strcmp(panTemp1->aadharNumber, panTemp2->aadharNumber) == 0) {
                 count++;
             }
-            temp = temp->next;
+            panTemp2 = panTemp2->next;
         }
-        if (count > 1) {
-            printf("Name: %s\n", current->name);
-            printf("Address: %s\n", current->address);
-            printf("Aadhar Number: %s\n", current->aadharNumber);
-            printf("PAN Numbers: ");
-            temp = panList;
-            while (temp != NULL) {
-                if (strcmp(current->aadharNumber, temp->aadharNumber) == 0) {
-                    printf("%s ", temp->panNumber);
-                }
-                temp = temp->next;
-            }
-            printf("\n\n");
+        if (count > 0) {
+            printf("%s\n", panTemp1->name);
         }
-        // Move to the next unique Aadhar number to avoid duplicate printing
-        char uniqueAadharNumber[MAX];
-        strcpy(uniqueAadharNumber, current->aadharNumber);
-        while (current != NULL && strcmp(current->aadharNumber, uniqueAadharNumber) == 0) {
-            current = current->next;
-        }
+        panTemp1 = panTemp1->next;
     }
 }
 
+// Function to print people with multiple bank accounts under multiple PAN numbers
 void printPeopleWithMultipleBankAccounts(PAN* panList, BankAccount* bankList) {
-    PAN* currentPAN = panList;
-
-    // Traverse the PAN list
-    while (currentPAN != NULL) {
-        int panCount = 0;
-        BankAccount* currentBank = bankList;
-
-        // Count how many bank accounts are associated with the current PAN
-        while (currentBank != NULL) {
-            if (strcmp(currentBank->panNumber, currentPAN->panNumber) == 0) {
-                panCount++;
+    PAN* panTemp1 = panList;
+    while (panTemp1 != NULL) {
+        PAN* panTemp2 = panTemp1->next;
+        int count = 0;
+        while (panTemp2 != NULL) {
+            if (strcmp(panTemp1->aadharNumber, panTemp2->aadharNumber) == 0) {
+                count++;
             }
-            currentBank = currentBank->next;
+            panTemp2 = panTemp2->next;
         }
-
-        // If the PAN has more than one bank account associated, print details
-        if (panCount > 1) {
-            // Print details from linked Aadhar
-            Aadhar* linkedAadhar = currentPAN->linkedAadhar;
-            if (linkedAadhar != NULL) {
-                printf("Name: %s\n", linkedAadhar->name);
-                printf("Address: %s\n", linkedAadhar->address);
-                printf("Aadhar Number: %s\n", linkedAadhar->aadharNumber);
-                printf("Bank Account: %s, PAN Count: %d\n\n", currentPAN->panNumber, panCount);
-            }
-        }
-
-        // Move to the next PAN node
-        currentPAN = currentPAN->next;
-    }
-}
-
-void printPersonWithLPGSubsidy(LPG* lpgList) {
-    LPG* currentLPG = lpgList;
-
-    while (currentLPG != NULL) {
-        if (strcmp(currentLPG->subsidyStatus, "YES") == 0) {
-            // Assuming you have pointers to Aadhar, PAN, and BankAccount nodes within LPG
-            BankAccount* linkedBank = currentLPG->linkedBankAccount;
-            PAN* linkedPAN = linkedBank->linkedPAN;
-			Aadhar* linkedAadhar = linkedPAN->linkedAadhar;
-          
-
-            // Print details if all necessary details are found
-            if (linkedAadhar != NULL && linkedPAN != NULL && linkedBank != NULL) {
-                printf("Name: %s\n", linkedAadhar->name);
-                printf("Address: %s\n", linkedAadhar->address);
-                printf("Aadhar Number: %s\n", linkedAadhar->aadharNumber);
-                printf("PAN Number: %s\n", linkedPAN->panNumber);
-                printf("Bank Name: %s\n", linkedBank->bank);
-                printf("Bank Account Number: %s\n", linkedBank->accountNumber);
-                printf("Deposited Amount: %.2f\n\n", linkedBank->depositedAmount);
-            }
-        }
-
-        currentLPG = currentLPG->next;
-    }
-
-}
-
-// Function to calculate total savings in all bank accounts for a given PAN number
-double calculateTotalSavings(BankAccount* bankList, char* panNumber) {
-    double totalSavings = 0.0;
-    BankAccount* currentBank = bankList;
-
-    while (currentBank != NULL) {
-        if (strcmp(currentBank->panNumber, panNumber) == 0) {
-            totalSavings += currentBank->depositedAmount;
-        }
-        currentBank = currentBank->next;
-    }
-
-    return totalSavings;
-}
-
-// Function to print details of people meeting the criteria
-void printPeopleWithSavingsAndLPG(LPG* lpgList, BankAccount* bankList, double amountX) {
-    LPG* currentLPG = lpgList;
-
-    while (currentLPG != NULL) {
-        if (strcmp(currentLPG->subsidyStatus, "YES") == 0) {
-            // Assuming each LPG node has pointers to Aadhar and PAN nodes
-           BankAccount* linkedBank = currentLPG->linkedBankAccount;
-            PAN* linkedPAN = linkedBank->linkedPAN;
-			Aadhar* linkedAadhar = linkedPAN->linkedAadhar;
-
-                double totalSavings = calculateTotalSavings(bankList, linkedPAN->panNumber);
-                if (totalSavings > amountX) {
-                    printf("Name: %s\n", linkedAadhar->name);
-                    printf("Address: %s\n", linkedAadhar->address);
-                    printf("Aadhar Number: %s\n", linkedAadhar->aadharNumber);
-                    printf("Total Savings: %.2f\n", totalSavings);
-                    printf("Bank Name: %s\n\n",linkedBank->bank);
+        if (count > 0) {
+            BankAccount* bankTemp = bankList;
+            while (bankTemp != NULL) {
+                if (strcmp(panTemp1->panNumber, bankTemp->panNumber) == 0) {
+                    printf("%s\n", bankTemp->name);
                 }
+                bankTemp = bankTemp->next;
+            }
         }
-        currentLPG = currentLPG->next;
+        panTemp1 = panTemp1->next;
     }
 }
 
-// Function to print inconsistent data
-void printInconsistentData(Aadhar* aadharList, PAN* panList, BankAccount* bankList, LPG* lpgList) {
-    // Traverse through Aadhar list and compare names
-    Aadhar* currentAadhar = aadharList;
-//    while (currentAadhar != NULL) {
-        PAN* currentPAN = panList;
-        BankAccount* currentBank = bankList;
-        LPG* currentLPG = lpgList;
-
-        // Compare name with PAN list
-        while (currentPAN != NULL) {
-            if (strcmp(currentAadhar->aadharNumber, currentPAN->aadharNumber) == 0 &&
-                strcmp(currentAadhar->name, currentPAN->name) != 0) {
-                printf("Inconsistent data found for Aadhar Number due to PAN: %s\n", currentAadhar->aadharNumber);
-                printf("Aadhar Name: %s\n", currentAadhar->name);
-                printf("PAN Name: %s\n\n", currentPAN->name);
+// Function to print details of person who has availed LPG subsidy
+void printPersonWithLPGSubsidy(LPG* lpgList) {
+    LPG* lpgTemp = lpgList;
+    while (lpgTemp != NULL) {
+        if (strcmp(lpgTemp->subsidyStatus, "YES") == 0) {
+            printf("Name: %s\n", lpgTemp->name);
+            printf("Account Number: %s\n", lpgTemp->accountNumber);
+            BankAccount* linkedBankAccount = lpgTemp->linkedBankAccount;
+            if (linkedBankAccount != NULL) {
+                PAN* linkedPAN = linkedBankAccount->linkedPAN;
+                if (linkedPAN != NULL) {
+                    Aadhar* linkedAadhar = linkedPAN->linkedAadhar;
+                    if (linkedAadhar != NULL) {
+                        printf("Aadhar Number: %s\n", linkedAadhar->aadharNumber);
+                    }
+                }
             }
-            else{
-            	currentAadhar=currentAadhar->next;
-			}
-            currentPAN = currentPAN->next;
         }
-		currentAadhar = aadharList;
-        // Compare name with Bank Account list
-        while (currentBank != NULL) {
-            if (strcmp(currentPAN->panNumber, currentPAN->panNumber) == 0 &&strcmp(currentAadhar->name, currentBank->name) != 0) {
-                printf("Inconsistent data found for Aadhar Number due to BANK: %s\n", currentAadhar->aadharNumber);
-                printf("Aadhar Name: %s\n", currentAadhar->name);
-                printf("Bank Account Name: %s\n\n", currentBank->name);
-            }
-            else{
-            	currentAadhar=currentAadhar->next;
-			}
-            currentBank = currentBank->next;
-        }
-		currentAadhar = aadharList;
-        // Compare name with LPG list
-        while (currentLPG != NULL) {
-            if (strcmp(currentAadhar->name, currentLPG->name) != 0) {
-                printf("Inconsistent data found for Aadhar Number due to LPG: %s\n", currentAadhar->aadharNumber);
-                printf("Aadhar Name: %s\n", currentAadhar->name);
-                printf("LPG Name: %s\n\n", currentLPG->name);
-            }
-            else{
-			
-           currentAadhar=currentAadhar->next;
-       }
-        currentLPG = currentLPG->next;
-		}
-
-    
-    //}
+        lpgTemp = lpgTemp->next;
+    }
 }
 
+// Function to print people with total savings > X and availed LPG subsidy
+void printPeopleWithSavingsAndLPG(LPG* lpgList, BankAccount* bankList, double amountX) {
+    LPG* lpgTemp = lpgList;
+    while (lpgTemp != NULL) {
+        if (strcmp(lpgTemp->subsidyStatus, "YES") == 0) {
+            BankAccount* bankTemp = bankList;
+            while (bankTemp != NULL) {
+                if (strcmp(lpgTemp->accountNumber, bankTemp->accountNumber) == 0 && bankTemp->depositedAmount > amountX) {
+                    printf("Name: %s\n", lpgTemp->name);
+                    printf("Account Number: %s\n", lpgTemp->accountNumber);
+                    printf("Deposited Amount: %.2f\n", bankTemp->depositedAmount);
+                }
+                bankTemp = bankTemp->next;
+            }
+        }
+        lpgTemp = lpgTemp->next;
+    }
+}
 
+// Function to check for inconsistencies in names across different lists
+void checkNameConsistency(Aadhar* aadharList, PAN* panList, BankAccount* bankList, LPG* lpgList) {
+    Aadhar* aadharTemp = aadharList;
+    while (aadharTemp != NULL) {
+        PAN* panTemp = panList;
+        while (panTemp != NULL) {
+            if (strcmp(aadharTemp->aadharNumber, panTemp->aadharNumber) == 0) {
+                if (strcmp(aadharTemp->name, panTemp->name) != 0) {
+                    printf("Name mismatch between Aadhar and PAN: %s (Aadhar) vs %s (PAN)\n", aadharTemp->name, panTemp->name);
+                }
+            }
+            panTemp = panTemp->next;
+        }
+        aadharTemp = aadharTemp->next;
+    }
 
+    PAN* panTemp = panList;
+    while (panTemp != NULL) {
+        BankAccount* bankTemp = bankList;
+        while (bankTemp != NULL) {
+            if (strcmp(panTemp->panNumber, bankTemp->panNumber) == 0) {
+                if (strcmp(panTemp->name, bankTemp->name) != 0) {
+                    printf("Name mismatch between PAN and Bank Account: %s (PAN) vs %s (Bank Account)\n", panTemp->name, bankTemp->name);
+                }
+            }
+            bankTemp = bankTemp->next;
+        }
+        panTemp = panTemp->next;
+    }
 
-
-
-
-
-
-
+    BankAccount* bankTemp = bankList;
+    while (bankTemp != NULL) {
+        LPG* lpgTemp = lpgList;
+        while (lpgTemp != NULL) {
+            if (strcmp(bankTemp->accountNumber, lpgTemp->accountNumber) == 0) {
+                if (strcmp(bankTemp->name, lpgTemp->name) != 0) {
+                    printf("Name mismatch between Bank Account and LPG: %s (Bank Account) vs %s (LPG)\n", bankTemp->name, lpgTemp->name);
+                }
+            }
+            lpgTemp = lpgTemp->next;
+        }
+        bankTemp = bankTemp->next;
+    }
+}
 
 int main() {
-    // Creating Aadhar nodes
-    Aadhar* aadhar1 = createAadhar("Alice", "123 Main St", "Aadhar123");
-    Aadhar* aadhar2 = createAadhar("Bob", "456 Oak St", "Aadhar456");
-    Aadhar* aadhar3 = createAadhar("John", "123 Main Street", "Aadhar789");
-    aadhar1->next = aadhar2;
-    aadhar2->next = aadhar3;
-//    printAadharList(aadhar1);
+    Aadhar* aadharList = NULL;
+    PAN* panList = NULL;
+    BankAccount* bankAccountList = NULL;
+    LPG* lpgList = NULL;
     
-    // Creating PAN nodes
-    PAN* pan1 = createPAN("Ali1", "123 Main St", "PAN123", "Aadhar123");
-	//bob does not have pan
-    PAN* pan2 = createPAN("Ali2","123 Main St", "PAN321" ,"Aadhar123");
-    pan1->next=pan2;
-	PAN* pan3 = createPAN("John", "123 Main Street", "PAN879", "Aadhar789");
-	pan2->next=pan3;
-    // Linking PAN nodes to Aadhar nodes
-    linkPANToAadhar(pan1, aadhar1);
-    linkPANToAadhar(pan2, aadhar1);
-    linkPANToAadhar(pan3, aadhar3);
+    // Populate Aadhar list
+    aadharList = insertAadhar(aadharList, "Aditi", "123 Main St", "A123");
+    aadharList = insertAadhar(aadharList, "Arnav", "456 Elm St", "A456");
+    aadharList = insertAadhar(aadharList, "Sarthak", "789 Oak St", "A789");
+    aadharList = insertAadhar(aadharList, "Aleena", "101 Pine St", "A101");
+    aadharList = insertAadhar(aadharList, "Mayank", "202 Maple St", "A202");
+    aadharList = insertAadhar(aadharList, "Abhinav", "303 Cedar St", "A303");
     
-//    printf("Aadhar List:\n");
-//    printAadharList(aadhar1);
-//
-//    printf("PAN List:\n");
-//    printPANList(pan1);
+    // Populate PAN list
+    panList = insertPAN(panList, aadharList, "Aditi", "123 Main St", "P123", "A123");
+    panList = insertPAN(panList, aadharList, "Aditi", "123 Main St", "P124", "A123"); // Multiple PAN for John Doe
+    panList = insertPAN(panList, aadharList, "Sarthak", "789 Oak St", "P789", "A789");
+    panList = insertPAN(panList, aadharList, "Aleena", "101 Pine St", "P101", "A101");
+    panList = insertPAN(panList, aadharList, "Mayank", "202 Maple St", "P202", "A202");
+    panList = insertPAN(panList, aadharList, "Abhinav", "303 Cedar St", "P303", "A303");
+    panList = insertPAN(panList, aadharList, "Abhinav", "303 Cedar St", "P304", "A303"); // Multiple PAN for David Wilson
     
-    // Printing Aadhar numbers without PAN numbers
+    // Populate Bank Account list
+    bankAccountList = insertBankAccount(bankAccountList, panList, "Aditi", "P123", "Bank1", "B123", 5000);
+    bankAccountList = insertBankAccount(bankAccountList, panList, "Aditi", "P124", "Bank2", "B124", 7000); // Multiple bank accounts for John Doe
+    bankAccountList = insertBankAccount(bankAccountList, panList, "Sarthak", "P789", "Bank1", "B789", 12000);
+    bankAccountList = insertBankAccount(bankAccountList, panList, "Aleena", "P101", "Bank2", "B101", 8000);
+    bankAccountList = insertBankAccount(bankAccountList, panList, "Mayank", "P202", "Bank3", "B202", 15000);
+    bankAccountList = insertBankAccount(bankAccountList, panList, "Abhinav", "P303", "Bank4", "B303", 6000);
+    bankAccountList = insertBankAccount(bankAccountList, panList, "Abhinav", "P304", "Bank5", "B304", 9000); // Multiple bank accounts for David Wilson
+    
+    // Populate LPG list
+    lpgList = insertLPG(lpgList, bankAccountList, "Aditi", "B123", "YES");
+    lpgList = insertLPG(lpgList, bankAccountList, "Sarthak", "B789", "YES");
+    lpgList = insertLPG(lpgList, bankAccountList, "Aleena", "B101", "NO");
+    lpgList = insertLPG(lpgList, bankAccountList, "Mayank", "B202", "YES");
+    lpgList = insertLPG(lpgList, bankAccountList, "Abhinav", "B303", "YES");
+    lpgList = insertLPG(lpgList, bankAccountList, "Abhinav", "B304", "NO"); // Multiple accounts, some with subsidy, some without
+    
+    // Example function calls to demonstrate functionality
     printf("Aadhar numbers without PAN numbers:\n");
-    printAadharWithoutPAN(aadhar1, pan1);
+    printAadharWithoutPAN(aadharList, panList);
     
-    // Print names, addresses, and Aadhar numbers of people with multiple PAN numbers
-    printf("People with multiple PAN numbers:\n");
-    printPeopleWithMultiplePANs(pan1);
+    printf("\nPeople with multiple PAN numbers:\n");
+    printPeopleWithMultiplePANs(panList);
     
-    // Creating Bank Account nodes
-    BankAccount* bank1 = createBankAccount("Alice", "PAN123", "Bank A", "12345", 1000.0);
-    BankAccount* bank2 = createBankAccount("Alice", "PAN123", "Bank Q", "67892", 5000.0);
-    BankAccount* bank3 = createBankAccount("Alice", "PAN321", "Bank B", "67890", 2000.0);
-    BankAccount* bank4 = createBankAccount("Alice", "PAN321", "Bank P", "67881", 3000.0);
-    BankAccount* bank5 = createBankAccount("John", "PAN879", "Bank B", "67891", 2000.0);
-    bank1->next = bank2;
-    bank2->next = bank3;
-    bank3->next=bank4;
-	bank4->next=bank5;
-	// Linking Bank Account nodes to PAN nodes
-    linkBankAccountToPAN(bank1, pan1);
-    linkBankAccountToPAN(bank2, pan1);
-    linkBankAccountToPAN(bank3, pan2);
-    linkBankAccountToPAN(bank4, pan2);
-    linkBankAccountToPAN(bank5, pan3);
+    printf("\nPeople with multiple bank accounts under multiple PAN numbers:\n");
+    printPeopleWithMultipleBankAccounts(panList, bankAccountList);
     
-    // Print names, addresses, and Aadhar numbers of people with multiple bank accounts under multiple PAN numbers
-    printf("People with multiple bank accounts under multiple PAN numbers:\n");
-    printPeopleWithMultipleBankAccounts(pan1, bank1);
-
-    // Creating LPG nodes
-    LPG* lpg1 = createLPG("Alice", "12345", "YES");//bank A
-    LPG* lpg2 = createLPG("Alice", "67892", "NO");
-    LPG* lpg3 = createLPG("Alice", "67890", "NO");
-    LPG* lpg4 = createLPG("alice", "67881", "NO");
-    LPG* lpg5 = createLPG("John", "67891", "YES");
-    lpg1->next = lpg2;
-	lpg2->next = lpg3;
-	lpg3->next = lpg4;
-	lpg4->next = lpg5;
-    // Linking LPG nodes to Bank Account nodes
-    linkLPGToBankAccount(lpg1, bank1);
-    linkLPGToBankAccount(lpg2, bank2);
-    linkLPGToBankAccount(lpg3, bank3);
-    linkLPGToBankAccount(lpg4, bank4);
-    linkLPGToBankAccount(lpg5, bank5);
+    printf("\nDetails of person who has availed LPG subsidy:\n");
+    printPersonWithLPGSubsidy(lpgList);
     
-    printf("Details of person who has availed LPG subsidy:\n");
-    printPersonWithLPGSubsidy(lpg1);
+    printf("\nPeople with total savings > 10000 and availed LPG subsidy:\n");
+    printPeopleWithSavingsAndLPG(lpgList, bankAccountList, 10000);
     
-    double amountX;
-    printf("Enter the amount X: ");
-    scanf("%lf", &amountX);
-
-    // Call the function to print details of people meeting the criteria
-    printf("People with total savings > %.2f and availed LPG subsidy:\n", amountX);
-    printPeopleWithSavingsAndLPG(lpg1, bank1, amountX);
-    
-    printf("Inconsistent data:\n");
-    printInconsistentData(aadhar1, pan1, bank1, lpg1);
-
-//    // Printing lists
-//    printf("Aadhar List:\n");
-//    printAadharList(aadhar1);
-//
-//    printf("PAN List:\n");
-//    printPANList(pan1);
-//
-//    printf("Bank Account List:\n");
-//    printBankAccountList(bank1);
-//
-//    printf("LPG List:\n");
-//    printLPGList(lpg1);
-//
-//    // Freeing allocated memory
-//    free(aadhar1);
-//    free(aadhar2);
-//    free(pan1);
-//    free(pan2);
-//    free(bank1);
-//    free(bank2);
-//    free(lpg1);
-//    free(lpg2);
+    printf("\nChecking name consistency across lists:\n");
+    checkNameConsistency(aadharList, panList, bankAccountList, lpgList);
     
     return 0;
 }
-
-//Aadhar* aadharList = NULL;       // Initialize with actual data
-//PAN* panList = NULL;             // Initialize with actual data
-//BankAccount* bankList = NULL; 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
